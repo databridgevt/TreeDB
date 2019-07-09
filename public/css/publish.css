@@ -1,0 +1,29 @@
+body {
+  background-image: url("/images/treebackground1.png");
+  color: grey;
+}
+
+.btn {
+  background-color: grey;
+  color: white;
+}
+
+.publish-input {
+  position: absolute;
+  width: 50%;
+  margin: 0;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  color: white;
+  right: 25%;
+  text-align: center;
+}
+
+.publish-input button {
+  width: 100%;
+}
+
+.publish-input > * {
+  margin-top: 0.3rem;
+}

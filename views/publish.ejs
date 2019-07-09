@@ -1,0 +1,13 @@
+<%- include("partials/header"); -%>
+<link rel="stylesheet" href="/css/publish.css">
+
+<form action="/publish" method="post">
+  <div class="publish-input">
+    <h1>Publish a New Article to TreeDB</h1>
+    <input class="form-control" type="text" name="newName" placeholder="Article Name">
+    <input class="form-control" type="text" name="newAuthor" placeholder="Author">
+    <button class="btn" type="submit" name="button">Submit</button>
+  </div>
+</form>
+
+<%- include("partials/footer"); -%>

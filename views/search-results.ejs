@@ -1,0 +1,24 @@
+<%- include("partials/header"); -%>
+<link rel="stylesheet" href="/css/search-results.css">
+
+<div class="search-results-container">
+  <table>
+    <% potentialArticles.forEach(function(article){ %>
+    <tr>
+      <td>
+        <div class="entry-container">
+          <div class="article-info">
+            <h4><%=article.name%></h4>
+            <p><%=article.author%></p>
+          </div>
+          <form id="form-<%=article._id%>" action="/delete" method="post">
+            <button type="submit" name="deleteButton" value = "<%=article._id%>" onclick="$('#form-<%=article._id%>').submit();" class="fas fa-minus-circle fa-2x"></button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    <% }) %>
+  </table>
+</div>
+
+<%- include("partials/footer"); -%>

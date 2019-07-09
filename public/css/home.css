@@ -1,0 +1,23 @@
+body {
+  background-image: url("/images/treebackground1.png");
+  color: grey;
+}
+
+#search-input {
+  position: absolute;
+  width: 50%;
+  margin: 0;
+  margin-left: 25%;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+#search-input button {
+  background-color: white;
+}
+
+#search-input button:hover {
+  background-color: rgb(90, 98, 105);
+}

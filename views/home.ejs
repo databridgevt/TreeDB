@@ -1,0 +1,13 @@
+<%- include("partials/header"); -%>
+<link rel="stylesheet" href="/css/home.css">
+
+<form action="/" method="post">
+  <div id="search-input" class="input-group mb-3 search-options">
+    <input name="searchName" type="text" id="home-search-input" class="form-control" placeholder="Search Journal Article" aria-label="Recipient's username" aria-describedby="basic-addon2">
+    <div class="input-group-append">
+      <button type="submit" id="home-search-btn" class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+    </div>
+  </div>
+</form>
+
+<%- include("partials/footer"); -%>

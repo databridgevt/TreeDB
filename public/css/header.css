@@ -1,0 +1,32 @@
+nav {
+  background-color: white;
+}
+
+.container {
+  margin-left: 10%;
+  margin-right: 10%;
+  padding: 0;
+}
+
+.navbar {
+  padding: 1rem 0;
+}
+
+.navbar-buttons > a{
+  padding: 0.5rem;
+  background-color: grey;
+  border-radius: 3rem;
+  color: white;
+  display: inline-block;
+  width: 8rem;
+  text-align: center;
+}
+
+.navbar-brand {
+  color: grey;
+  font-size: 2rem;
+}
+
+.navbar-brand:hover {
+  color: grey;
+}

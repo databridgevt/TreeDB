@@ -1,0 +1,56 @@
+body {
+  background-image: url("/images/treebackground1.png");
+}
+
+button[type="submit"] {
+  color: grey;
+  background-color: white;
+  border-radius: 5px;
+  border-style: none;
+  box-shadow: none;
+  outline-style: none;
+}
+
+.search-results-container table {
+  color: grey;
+  background-color: white;
+  margin: 5% 10%;
+  width: 80%;
+  border-radius: .5rem;
+}
+
+.search-results-container tr {
+  border-top: 1px solid grey;
+}
+
+.search-results-container td{
+  background-color: white;
+  color: grey;
+  cursor: pointer;
+}
+
+.search-results-container td:hover {
+  background-color: grey;
+  color: white;
+  cursor: pointer;
+}
+
+.search-results-container td:hover button {
+  background-color: grey;
+  color: white;
+  cursor: pointer;
+}
+
+tr:first-child {
+  border: 0;
+}
+
+.entry-container {
+  display: grid;
+  grid-template-columns: 20fr 1fr;
+}
+
+.entry-container button {
+  margin-top: 1.25rem;
+  padding: 0;
+}
