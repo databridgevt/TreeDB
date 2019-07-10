@@ -76,8 +76,8 @@ app.get("/publish", function(req, res) {
 
 function search(foundArticles, searchedName) {
   matchedArticles = [];
-  searchName = searchName.replace(/\s/g, '');
-  if (searchName == "") {
+  searchedName = searchedName.replace(/\s/g, '');
+  if (searchedName == "") {
     return matchedArticles;
   }
   foundArticles.forEach(function(article){
