@@ -19,6 +19,17 @@ const articleSchema = {
 };
 const Article = mongoose.model("Article", articleSchema);
 
+function print(articles, attr) {
+  articles.forEach(function(article){
+    if (attr == "name") {
+      console.log(article.name);
+    }
+    if (attr == "author") {
+      console.log(article.author);
+    }
+  });
+};
+
 const article1 = new Article({
   name: "Post-fertilization physiology and growth performance of loblolly pine clones",
   author: "N.T King, J. R. Seiler, T.R. Fox, K. H. Johnsen"
@@ -63,11 +74,33 @@ app.get("/publish", function(req, res) {
   res.render("publish");
 });
 
+function search(foundArticles, searchedName) {
+  matchedArticles = [];
+  foundArticles.forEach(function(article){
+    if (article.name.toLowerCase().includes(searchedName.toLowerCase())) {
+      matchedArticles.push(article);
+    }
+    if (article.author.toLowerCase().includes(searchedName.toLowerCase())) {
+      matchedArticles.push(article);
+    }
+  });
+  console.log("Matched:");
+  print(matchedArticles, "author");
+  // for (var i = 1; i <= searchedName.length-1; i++) {
+  //   console.log(searchedName.slice(-5, -i));
+  // }
+  console.log("\nNot Matched..");
+  print(foundArticles, "author");
+  return matchedArticles;
+};
+
 app.post("/", function(req, res) {
+  searchedName =  req.body.searchName;
   potentialArticles = [];
   Article.find({}, function(err, foundArticles) {
     if (foundArticles.length == 0) {
       Article.insertMany(articles, function(err) {
+        console.log("No articles in database... Adding default papers...");
         if (err) {
           console.log(err);
         } else {
@@ -78,6 +111,7 @@ app.post("/", function(req, res) {
         potentialArticles: articles
       });
     } else {
+      foundArticles = search(foundArticles, searchedName);
       res.render("search-results", {
         potentialArticles: foundArticles
       });

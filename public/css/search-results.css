@@ -12,11 +12,8 @@ button[type="submit"] {
 }
 
 .search-results-container table {
-  color: grey;
-  background-color: white;
   margin: 5% 10%;
   width: 80%;
-  border-radius: .5rem;
 }
 
 .search-results-container tr {
@@ -27,6 +24,7 @@ button[type="submit"] {
   background-color: white;
   color: grey;
   cursor: pointer;
+  border-radius: 0.5rem;
 }
 
 .search-results-container td:hover {
