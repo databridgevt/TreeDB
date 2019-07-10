@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const app = express();
+let displayedArticles = [];
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({
   extended: true
@@ -20,7 +21,7 @@ const articleSchema = {
 const Article = mongoose.model("Article", articleSchema);
 
 function print(articles, attr) {
-  articles.forEach(function(article){
+  articles.forEach(function(article) {
     if (attr == "name") {
       console.log(article.name);
     }
@@ -60,7 +61,7 @@ const article6 = new Article({
   author: "TestAuthor"
 });
 
-let articles = [article1, article2, article3, article4, article5, article6];
+let defaultArticles = [article1, article2, article3, article4, article5, article6];
 
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server is running on port 3000");
@@ -76,30 +77,28 @@ app.get("/publish", function(req, res) {
 
 function search(foundArticles, searchedName) {
   matchedArticles = [];
-  searchedName = searchedName.replace(/\s/g, '');
-  if (searchedName == "") {
+  str = searchedName.replace(/\s/g, '');
+  if (str == "") {
     return matchedArticles;
   }
-  foundArticles.forEach(function(article){
+  foundArticles.forEach(function(article) {
+    found = false;
     if (article.name.toLowerCase().includes(searchedName.toLowerCase())) {
       matchedArticles.push(article);
+      found = true;
     }
-    if (article.author.toLowerCase().includes(searchedName.toLowerCase())) {
+    if (article.author.toLowerCase().includes(searchedName.toLowerCase()) && !found) {
       matchedArticles.push(article);
     }
   });
-  console.log("Matched:");
-  print(matchedArticles, "author");
   // for (var i = 1; i <= searchedName.length-1; i++) {
   //   console.log(searchedName.slice(-5, -i));
   // }
-  console.log("\nNot Matched..");
-  print(foundArticles, "author");
   return matchedArticles;
 };
 
 app.post("/", function(req, res) {
-  searchedName =  req.body.searchName;
+  searchedName = req.body.searchName;
   potentialArticles = [];
   Article.find({}, function(err, foundArticles) {
     if (foundArticles.length == 0) {
@@ -112,14 +111,17 @@ app.post("/", function(req, res) {
         }
       });
       res.render("search-results", {
-        potentialArticles: articles
+        potentialArticles: defaultArticles
       });
+      displayedArticles = defaultArticles;
     } else {
-      foundArticles = search(foundArticles, searchedName);
+      displayedArticles = search(foundArticles, searchedName);
+      if (searchedName == "$ALL$") {
+        displayedArticles = foundArticles;
+      }
       res.render("search-results", {
-        potentialArticles: foundArticles
+        potentialArticles: displayedArticles
       });
-      articles = foundArticles;
     }
   });
 });
@@ -133,6 +135,15 @@ app.post("/publish", function(req, res) {
   res.redirect("/");
 });
 
+function remove(id, articles) {
+  for (var i = 0; i < articles.length; i++) {
+    if (articles[i]._id == id) {
+      articles.splice(i, 1);
+    }
+  }
+  return articles;
+};
+
 app.post("/delete", function(req, res) {
   const id = req.body.deleteButton;
   Article.findByIdAndDelete(id, function(err) {
@@ -140,10 +151,8 @@ app.post("/delete", function(req, res) {
       console.log(err);
     }
   });
-  Article.find({}, function(err, foundArticles) {
-    res.render("search-results", {
-      potentialArticles: foundArticles
-    });
-    articles = foundArticles;
+  displayedArticles = remove(id, displayedArticles);
+  res.render("search-results", {
+    potentialArticles: displayedArticles
   });
 });

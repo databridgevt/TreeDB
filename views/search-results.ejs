@@ -10,6 +10,7 @@
           <div class="article-info">
             <h4><%=article.name%></h4>
             <p><%=article.author%></p>
+            <p><%=article.date%></p>
           </div>
           <form id="form-<%=article._id%>" action="/delete" method="post">
             <button type="submit" name="deleteButton" value = "<%=article._id%>" onclick="$('#form-<%=article._id%>').submit();" class="fas fa-minus-circle fa-2x"></button>
