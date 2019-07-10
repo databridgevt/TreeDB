@@ -76,6 +76,10 @@ app.get("/publish", function(req, res) {
 
 function search(foundArticles, searchedName) {
   matchedArticles = [];
+  searchName = searchName.replace(/\s/g, '');
+  if (searchName == "") {
+    return matchedArticles;
+  }
   foundArticles.forEach(function(article){
     if (article.name.toLowerCase().includes(searchedName.toLowerCase())) {
       matchedArticles.push(article);
