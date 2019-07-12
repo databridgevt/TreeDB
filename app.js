@@ -16,9 +16,11 @@ mongoose.connect("mongodb+srv://admin-conork:Franklinglen16@cluster0-5je4y.mongo
 });
 const articleSchema = {
   name: String,
-  author: String
+  author: String,
+  date: String,
+  keywords: String
 };
-const Article = mongoose.model("Article", articleSchema);
+const Article = mongoose.model("ArticleEntry", articleSchema);
 
 function print(articles, attr) {
   articles.forEach(function(article) {
@@ -32,33 +34,45 @@ function print(articles, attr) {
 };
 
 const article1 = new Article({
-  name: "Post-fertilization physiology and growth performance of loblolly pine clones",
-  author: "N.T King, J. R. Seiler, T.R. Fox, K. H. Johnsen"
+  name: "Intra-annual nutrient flux in Pinus taeda",
+  author: "Timothy J. Albaugh, H. Lee Allen, Jose L. Stape, Thomas R. Fox, Rafael A. Rubilar and James W. Price",
+  date: "01/20/2012",
+  keywords: "Pinus taeda, flux"
 });
 
 const article2 = new Article({
-  name: "Genetic Variation in Nitrogen Use Efficiency of Loblolly Pine Seedlings",
-  author: "Bailian Li, S.E. McKeand, H.L. Allen"
+  name: "Ecosystem Nutrient Retention after Fertilization of Pinus taeda",
+  author: "Timothy J. Albaugh, L. Chris Kiser, Thomas R. Fox, H. Lee Allen, Rafael A. Rubilar, and Jose L. Stape",
+  date: "2014",
+  keywords: "fertilization, irrigation, nutrient balance, Pinus taeda"
 });
 
 const article3 = new Article({
-  name: "Nitrogen and Family Effects on Biomass Allocation of Loblolly Pine Seedlings",
-  author: "Bailian Li, S.E. McKeand, H.L. Allen"
+  name: "Soil Nitrogen Turnover is Altered by Herbicide Treatment in a North Carolina Piedmont Forest Soil",
+  author: "Steven W. Andariese, Peter M. Vitousek",
+  date: "04/14/1987",
+  keywords: "herbicide, soil nitrogen, insecticides"
 });
 
 const article4 = new Article({
-  name: "Responsiveness of Diverse Families of Loblolly Pine to Fertilization: Eight-Year REsults from SETRES-2",
-  author: "S.E. McKeand, J.E. Grissom, R. Rubilar and H.L. Allen"
+  name: "Irrigation and fertilization effects on foliar and soil carbon and nitrogen isotope ratios in a loblolly pine stand",
+  author: "Woo-Jung Choi, Scott X. Chang, H. Lee Allen, Daniel L. Kelting, Hee-Myong Ro",
+  date: "03/23/2005",
+  keywords: "irrigation, fertilization, loblolly, isotope"
 });
 
 const article5 = new Article({
   name: "Characterization of Foliar Macro- and Micronutrient Concentrations and Ratios in Loblolly Pine Plantations in the Southeastern United States",
-  author: "Janine M. Albaugh, Leandra Blevins, H. Lee Allen, Timothy J. Albaugh, Thomas R. Fox, Jose L. Stape, and Rafael A. Rubilar"
+  author: "Janine M. Albaugh, Leandra Blevins, H. Lee Allen, Timothy J. Albaugh, Thomas R. Fox, Jose L. Stape, and Rafael A. Rubilar",
+  date: "2010",
+  keywords: "Pinus taeda, foliar nutrient concentrations, nutrient ratios, loblolly"
 });
 
 const article6 = new Article({
   name: "TestName",
-  author: "TestAuthor"
+  author: "TestAuthor",
+  date: "01/31/2019",
+  keywords: "test, keyword"
 });
 
 let defaultArticles = [article1, article2, article3, article4, article5, article6];
@@ -82,12 +96,13 @@ function search(foundArticles, searchedName) {
     return matchedArticles;
   }
   foundArticles.forEach(function(article) {
-    found = false;
     if (article.name.toLowerCase().includes(searchedName.toLowerCase())) {
       matchedArticles.push(article);
-      found = true;
     }
-    if (article.author.toLowerCase().includes(searchedName.toLowerCase()) && !found) {
+    else if (article.author.toLowerCase().includes(searchedName.toLowerCase())) {
+      matchedArticles.push(article);
+    }
+    else if (article.keywords.toLowerCase().includes(searchedName.toLowerCase())) {
       matchedArticles.push(article);
     }
   });
@@ -102,7 +117,7 @@ app.post("/", function(req, res) {
   potentialArticles = [];
   Article.find({}, function(err, foundArticles) {
     if (foundArticles.length == 0) {
-      Article.insertMany(articles, function(err) {
+      Article.insertMany(defaultArticles, function(err) {
         console.log("No articles in database... Adding default papers...");
         if (err) {
           console.log(err);
