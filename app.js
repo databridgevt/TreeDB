@@ -144,7 +144,9 @@ app.post("/", function(req, res) {
 app.post("/publish", function(req, res) {
   const newArticle = new Article({
     name: req.body.newName,
-    author: req.body.newAuthor
+    author: req.body.newAuthor,
+    date: req.body.newDate,
+    keywords: req.body.newKeyWords
   });
   newArticle.save()
   res.redirect("/");
