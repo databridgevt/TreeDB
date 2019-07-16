@@ -77,8 +77,9 @@ const article6 = new Article({
 
 let defaultArticles = [article1, article2, article3, article4, article5, article6];
 
-app.listen(process.env.PORT || 3000, function() {
-  console.log("Server is running on port 3000");
+// app.listen(process.env.PORT || 3000, function() {
+app.listen(80, function() {
+  console.log("Server is running on port 80");
 });
 
 app.get("/", function(req, res) {
@@ -116,12 +117,15 @@ app.post("/", function(req, res) {
   searchedName = req.body.searchName;
   potentialArticles = [];
   Article.find({}, function(err, foundArticles) {
+
     if (foundArticles.length == 0) {
       Article.insertMany(defaultArticles, function(err) {
         console.log("No articles in database... Adding default papers...");
         if (err) {
           console.log(err);
-        } else {
+        }
+
+        else {
           console.log("Successfully saved default articles to database!!!");
         }
       });
@@ -129,9 +133,11 @@ app.post("/", function(req, res) {
         potentialArticles: defaultArticles
       });
       displayedArticles = defaultArticles;
-    } else {
+    } 
+
+    else {
       displayedArticles = search(foundArticles, searchedName);
-      if (searchedName == "$ALL$") {
+      if (searchedName == "") {
         displayedArticles = foundArticles;
       }
       res.render("search-results", {
