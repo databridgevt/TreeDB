@@ -21,6 +21,16 @@ const articleSchema = {
   keywords: String
 };
 const Article = mongoose.model("ArticleEntry", articleSchema);
+  /* TODO: Remove before Production
+      Bug fix #1:  
+      Dubbed the ToLowerCase bug
+      Fix: MongoDB needs to be cleaned out each time ther server restarts
+  */
+//Clean DB
+Article.deleteMany({}, () => {
+  console.log('db cleaned')
+});
+
 
 function print(articles, attr) {
   articles.forEach(function(article) {
@@ -75,11 +85,13 @@ const article6 = new Article({
   keywords: "test, keyword"
 });
 
-let defaultArticles = [article1, article2, article3, article4, article5, article6];
+const defaultArticles = [article1, article2, article3, article4, article5, article6];
+Article.insertMany(defaultArticles);
 
 // app.listen(process.env.PORT || 3000, function() {
-app.listen(80, function() {
-  console.log("Server is running on port 80");
+// Tanner - was port 80, changed to port 3000
+app.listen(3000, function() {
+  console.log("Server is running on port 3000"); //changed to 3000
 });
 
 app.get("/", function(req, res) {
@@ -93,6 +105,7 @@ app.get("/publish", function(req, res) {
 function search(foundArticles, searchedName) {
   matchedArticles = [];
   str = searchedName.replace(/\s/g, '');
+  console.log(foundArticles)
   if (str == "") {
     return matchedArticles;
   }
@@ -115,16 +128,15 @@ function search(foundArticles, searchedName) {
 
 app.post("/", function(req, res) {
   searchedName = req.body.searchName;
-  potentialArticles = [];
+  potentialArticles = []; 
   Article.find({}, function(err, foundArticles) {
-
+    console.log(foundArticles.length)
     if (foundArticles.length == 0) {
       Article.insertMany(defaultArticles, function(err) {
         console.log("No articles in database... Adding default papers...");
         if (err) {
           console.log(err);
         }
-
         else {
           console.log("Successfully saved default articles to database!!!");
         }
@@ -133,9 +145,7 @@ app.post("/", function(req, res) {
         potentialArticles: defaultArticles
       });
       displayedArticles = defaultArticles;
-    } 
-
-    else {
+    } else {
       displayedArticles = search(foundArticles, searchedName);
       if (searchedName == "") {
         displayedArticles = foundArticles;
