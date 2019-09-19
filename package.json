@@ -12,9 +12,11 @@
     "node": "10.16.0"
   },
   "dependencies": {
+    "angular": "^1.7.8",
     "body-parser": "^1.19.0",
     "ejs": "^2.7.1",
     "express": "^4.17.1",
-    "mongoose": "^5.7.1"
+    "mongoose": "^5.7.1",
+    "typescript": "^3.6.3"
   }
 }
