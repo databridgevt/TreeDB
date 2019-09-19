@@ -1,7 +1,7 @@
 //jshint esversion:6
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
+const Article = require('./db/build_db.js');
 
 const app = express();
 let displayedArticles = [];
@@ -11,27 +11,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb+srv://admin-conork:Franklinglen16@cluster0-5je4y.mongodb.net/treeDB", {
-  useNewUrlParser: true
-});
-const articleSchema = {
-  name: String,
-  author: String,
-  date: String,
-  keywords: String
-};
-const Article = mongoose.model("ArticleEntry", articleSchema);
-  /* TODO: Remove before Production
-      Bug fix #1:  
-      Dubbed the ToLowerCase bug
-      Fix: MongoDB needs to be cleaned out each time ther server restarts
-  */
-//Clean DB
-Article.deleteMany({}, () => {
-  console.log('db cleaned')
-});
-
-
+//NOTE unused function
 function print(articles, attr) {
   articles.forEach(function(article) {
     if (attr == "name") {
@@ -43,54 +23,8 @@ function print(articles, attr) {
   });
 };
 
-const article1 = new Article({
-  name: "Intra-annual nutrient flux in Pinus taeda",
-  author: "Timothy J. Albaugh, H. Lee Allen, Jose L. Stape, Thomas R. Fox, Rafael A. Rubilar and James W. Price",
-  date: "01/20/2012",
-  keywords: "Pinus taeda, flux"
-});
-
-const article2 = new Article({
-  name: "Ecosystem Nutrient Retention after Fertilization of Pinus taeda",
-  author: "Timothy J. Albaugh, L. Chris Kiser, Thomas R. Fox, H. Lee Allen, Rafael A. Rubilar, and Jose L. Stape",
-  date: "2014",
-  keywords: "fertilization, irrigation, nutrient balance, Pinus taeda"
-});
-
-const article3 = new Article({
-  name: "Soil Nitrogen Turnover is Altered by Herbicide Treatment in a North Carolina Piedmont Forest Soil",
-  author: "Steven W. Andariese, Peter M. Vitousek",
-  date: "04/14/1987",
-  keywords: "herbicide, soil nitrogen, insecticides"
-});
-
-const article4 = new Article({
-  name: "Irrigation and fertilization effects on foliar and soil carbon and nitrogen isotope ratios in a loblolly pine stand",
-  author: "Woo-Jung Choi, Scott X. Chang, H. Lee Allen, Daniel L. Kelting, Hee-Myong Ro",
-  date: "03/23/2005",
-  keywords: "irrigation, fertilization, loblolly, isotope"
-});
-
-const article5 = new Article({
-  name: "Characterization of Foliar Macro- and Micronutrient Concentrations and Ratios in Loblolly Pine Plantations in the Southeastern United States",
-  author: "Janine M. Albaugh, Leandra Blevins, H. Lee Allen, Timothy J. Albaugh, Thomas R. Fox, Jose L. Stape, and Rafael A. Rubilar",
-  date: "2010",
-  keywords: "Pinus taeda, foliar nutrient concentrations, nutrient ratios, loblolly"
-});
-
-const article6 = new Article({
-  name: "TestName",
-  author: "TestAuthor",
-  date: "01/31/2019",
-  keywords: "test, keyword"
-});
-
-const defaultArticles = [article1, article2, article3, article4, article5, article6];
-Article.insertMany(defaultArticles);
-
-// app.listen(process.env.PORT || 3000, function() {
-// Tanner - was port 80, changed to port 3000
-app.listen(3000, function() {
+// Tanner - was port 80, changed to port 3000, TODO: needs to be 80 on lightsail
+app.listen(process.env.PORT || 3000, function() {
   console.log("Server is running on port 3000"); //changed to 3000
 });
 
@@ -102,6 +36,11 @@ app.get("/publish", function(req, res) {
   res.render("publish");
 });
 
+/*
+  This function takes an array of all articles in the db (foundArticles) and 
+  checks if searchedName is contained within some of the document's porperties.
+  An array of articels containg searchedName is returned.
+*/
 function search(foundArticles, searchedName) {
   matchedArticles = [];
   str = searchedName.replace(/\s/g, '');
@@ -120,12 +59,20 @@ function search(foundArticles, searchedName) {
       matchedArticles.push(article);
     }
   });
-  // for (var i = 1; i <= searchedName.length-1; i++) {
-  //   console.log(searchedName.slice(-5, -i));
-  // }
   return matchedArticles;
 };
 
+/*
+  This post request is meant to search the database for articels that match a 
+  requested phrase. This requested phrase is checked against articles in the database,
+  and articles containing that phrase in the following document's properties
+  {
+    name: String,
+    author: String,
+    keywords: String
+  }
+  should be passed to the webpage to render the results.
+*/
 app.post("/", function(req, res) {
   searchedName = req.body.searchName;
   potentialArticles = []; 
@@ -157,6 +104,10 @@ app.post("/", function(req, res) {
   });
 });
 
+/*
+ * This post is menat to upload a new pdf to be stored in the database.
+ * The db should then save the articels and redirect the user back to home ("/").
+ */
 app.post("/publish", function(req, res) {
   const newArticle = new Article({
     name: req.body.newName,
@@ -168,6 +119,14 @@ app.post("/publish", function(req, res) {
   res.redirect("/");
 });
 
+/**
+ * This function is meant to splice out the article to be deleted. 
+ * Then it should return an array of all articles to be displayed after deletion.
+ * 
+ * param id: The _id (in mongodb) of the article to be deleted
+ * param articles: An array of currently displayed articels on the web page.
+ * returns An array of the srticles to be displayed on the web page.
+ */
 function remove(id, articles) {
   for (var i = 0; i < articles.length; i++) {
     if (articles[i]._id == id) {
@@ -177,8 +136,20 @@ function remove(id, articles) {
   return articles;
 };
 
+/*
+  FIXME:
+    Was routed to "/delete" using post request
+    Want to route to root using delete request
+    HTML only lets forms submit GET and POST requests
+*/
+/*
+  This post request is meant to delete one of the 
+  currently displayed articles from the database.
+  Then the webpage should be sent a new array of articles to render.
+*/
 app.post("/delete", function(req, res) {
   const id = req.body.deleteButton;
+  console.log(id)
   Article.findByIdAndDelete(id, function(err) {
     if (err) {
       console.log(err);
