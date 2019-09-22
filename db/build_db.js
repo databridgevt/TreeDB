@@ -12,7 +12,9 @@ const articleSchema = {
     author: String,
     date: String,
     keywords: String
+    //Add binary here
   };
+// @ts-ignore
 const Article = mongoose.model("ArticleEntry", articleSchema);
 
 /* TODO: Remove before Production
