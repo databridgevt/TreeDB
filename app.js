@@ -114,7 +114,7 @@ app.post("/", function(req, res) {
  * This post is meant to upload a new pdf to be stored in the database.
  * The db should then save the articels and redirect the user back to home ("/").
  */
-app.post("/publish", function(req, res) {
+app.post("/publish", function(req, res, next) {
   const form = new formidable.IncomingForm();
   form.parse(req);
   form.on('fileBegin', (name, file) => {
