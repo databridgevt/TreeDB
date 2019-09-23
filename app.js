@@ -2,7 +2,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const Article = require('./db/build_db.js');
-
+const formidable = require("formidable");
+const mongoose = require("mongoose");
 const app = express();
 let displayedArticles = [];
 app.set("view engine", "ejs");
@@ -10,6 +11,11 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(express.static("public"));
+
+mongoose.connect("mongodb+srv://admin-conork:Franklinglen16@cluster0-5je4y.mongodb.net/treeDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 //NOTE unused function
 function print(articles, attr) {
@@ -105,10 +111,23 @@ app.post("/", function(req, res) {
 });
 
 /*
- * This post is menat to upload a new pdf to be stored in the database.
+ * This post is meant to upload a new pdf to be stored in the database.
  * The db should then save the articels and redirect the user back to home ("/").
  */
 app.post("/publish", function(req, res) {
+  const form = new formidable.IncomingForm();
+  form.parse(req);
+  form.on('fileBegin', (name, file) => {
+    file.path =  __dirname + '/uploads/' + file.name;
+    req.body.fileName = file.name;
+    req.body.filePath = file.path;
+    console.log('File Received');
+  });
+  form.on('end',  () => {
+    console.log('Uploaded File: ' + req.body.fileName);
+  })
+  next();
+}, (req, res) => {
   const newArticle = new Article({
     name: req.body.newName,
     author: req.body.newAuthor,
@@ -116,6 +135,7 @@ app.post("/publish", function(req, res) {
     keywords: req.body.newKeyWords
   });
   newArticle.save()
+  res.status(200);
   res.redirect("/");
 });
 
