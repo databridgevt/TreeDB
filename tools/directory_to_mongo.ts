@@ -1,4 +1,4 @@
-import { Dirent } from "fs";
+import { Dirent } from 'fs';
 import { GridFSBucket } from "mongodb";
 
 const fs = require('fs')
