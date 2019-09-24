@@ -15,6 +15,9 @@
           <form id="form-<%=article._id%>" action="/delete" method="post">
             <button type="submit" name="deleteButton" value = "<%=article._id%>" onclick="$('#form-<%=article._id%>').submit();" class="fas fa-minus-circle fa-2x"></button>
           </form>
+          <form id="form-<%=article._id%>" action="/download" method="get">
+              <button type="submit" name="downButton" value = "<%=article._id%>" onclick="$('#form-<%=article._id%>').submit();" class="fas fa-angle-double-down fa-2x"></button>
+          </form>
         </div>
       </td>
     </tr>

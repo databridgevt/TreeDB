@@ -51,7 +51,6 @@ app.get("/publish", function(req, res) {
 function search(foundArticles, searchedName) {
   matchedArticles = [];
   str = searchedName.replace(/\s/g, '');
-  console.log(foundArticles)
   if (str == "") {
     return matchedArticles;
   }
@@ -84,7 +83,6 @@ app.post("/", function(req, res) {
   searchedName = req.body.searchName;
   potentialArticles = []; 
   Article.find({}, function(err, foundArticles) {
-    console.log(foundArticles.length)
     if (foundArticles.length == 0) {
       Article.insertMany(defaultArticles, function(err) {
         console.log("No articles in database... Adding default papers...");
@@ -122,17 +120,14 @@ app.post("/publish", function(req, res, next) {
     file.path =  __dirname + '/uploads/' + file.name;
     req.body.fileName = file.name;
     req.body.filePath = file.path;
-    console.log('File Received');
   });
   form.on('end',  () => {
-    console.log('Locally Stored File: ' + req.body.fileName);
     fs.readFile(__dirname + '/uploads/' + req.body.fileName, (err, fileBuffer) => {
       if (err) {
         console.log('here1')
         console.log(err)
         res.status(500);
       }
-      console.log('did not err')
       const newArticle = new Article({
         name: req.body.newName,
         author: req.body.newAuthor,
@@ -142,6 +137,7 @@ app.post("/publish", function(req, res, next) {
       });
       newArticle.save()
     });
+    fs.unlink(__dirname + '/uploads/' + req.body.fileName, () => console.log('deleted File.'));
     res.status(200);
     res.redirect("/");
   });
@@ -187,4 +183,15 @@ app.post("/delete", function(req, res) {
   res.render("search-results", {
     potentialArticles: displayedArticles
   });
+});
+
+app.get("/download", (req, res) => {
+  const id = req.body.downButton;
+  Article.findById(id, (err, doc) => {
+    if (err) {
+      res.status(500);
+      return;
+    }
+    res.download(doc.file);
+  })
 });
