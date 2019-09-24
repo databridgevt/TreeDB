@@ -11,7 +11,8 @@ const articleSchema = {
     name: String,
     author: String,
     date: String,
-    keywords: String
+    keywords: String,
+    file: Buffer
   };
 const Article = mongoose.model("ArticleEntry", articleSchema);
 

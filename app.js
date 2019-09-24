@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const Article = require('./db/build_db.js');
 const formidable = require("formidable");
 const mongoose = require("mongoose");
+const fs = require("fs");
 const app = express();
 let displayedArticles = [];
 app.set("view engine", "ejs");
@@ -124,19 +125,26 @@ app.post("/publish", function(req, res, next) {
     console.log('File Received');
   });
   form.on('end',  () => {
-    console.log('Uploaded File: ' + req.body.fileName);
-  })
-  next();
-}, (req, res) => {
-  const newArticle = new Article({
-    name: req.body.newName,
-    author: req.body.newAuthor,
-    date: req.body.newDate,
-    keywords: req.body.newKeyWords
+    console.log('Locally Stored File: ' + req.body.fileName);
+    fs.readFile(__dirname + '/uploads/' + req.body.fileName, (err, fileBuffer) => {
+      if (err) {
+        console.log('here1')
+        console.log(err)
+        res.status(500);
+      }
+      console.log('did not err')
+      const newArticle = new Article({
+        name: req.body.newName,
+        author: req.body.newAuthor,
+        date: req.body.newDate,
+        keywords: req.body.newKeyWords,
+        file: fileBuffer
+      });
+      newArticle.save()
+    });
+    res.status(200);
+    res.redirect("/");
   });
-  newArticle.save()
-  res.status(200);
-  res.redirect("/");
 });
 
 /**
