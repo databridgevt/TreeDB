@@ -14,6 +14,7 @@ const articleSchema = {
     keywords: String,
     file: Buffer
   };
+// @ts-ignore
 const Article = mongoose.model("ArticleEntry", articleSchema);
 
 /* TODO: Remove before Production
