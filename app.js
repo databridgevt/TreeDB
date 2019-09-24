@@ -124,8 +124,6 @@ app.post("/publish", function(req, res, next) {
   form.on('end',  () => {
     fs.readFile(__dirname + '/uploads/' + req.body.fileName, (err, fileBuffer) => {
       if (err) {
-        console.log('here1')
-        console.log(err)
         res.status(500);
       }
       const newArticle = new Article({
@@ -173,7 +171,6 @@ function remove(id, articles) {
 */
 app.post("/delete", function(req, res) {
   const id = req.body.deleteButton;
-  console.log(id)
   Article.findByIdAndDelete(id, function(err) {
     if (err) {
       console.log(err);
