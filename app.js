@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const Article = require('./db/build_db.js');
 const formidable = require("formidable");
 const mongoose = require("mongoose");
+const multer = require('multer');
 const fs = require("fs");
 const app = express();
 let displayedArticles = [];
@@ -13,10 +14,18 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
+//multer set-up
+const upload = multer({
+  dest: 'uploads/',
+  fileFilter: '.pdf'
+});
+
+/*
 mongoose.connect("mongodb+srv://admin-conork:Franklinglen16@cluster0-5je4y.mongodb.net/treeDB", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
+*/
 
 //NOTE unused function
 function print(articles, attr) {
@@ -28,7 +37,7 @@ function print(articles, attr) {
       console.log(article.author);
     }
   });
-};
+}
 
 // Tanner - was port 80, changed to port 3000, TODO: needs to be 80 on lightsail
 app.listen(process.env.PORT || 3000, function() {
@@ -49,12 +58,13 @@ app.get("/publish", function(req, res) {
   An array of articels containg searchedName is returned.
 */
 function search(foundArticles, searchedName) {
-  matchedArticles = [];
-  str = searchedName.replace(/\s/g, '');
+  let matchedArticles = [];
+  let str = searchedName.replace(/\s/g, '');
   if (str == "") {
     return matchedArticles;
   }
   foundArticles.forEach(function(article) {
+    console.log(article)
     if (article.name.toLowerCase().includes(searchedName.toLowerCase())) {
       matchedArticles.push(article);
     }
@@ -66,10 +76,10 @@ function search(foundArticles, searchedName) {
     }
   });
   return matchedArticles;
-};
+}
 
 /*
-  This post request is meant to search the database for articels that match a 
+  This post request is meant to search the database for articles that match a 
   requested phrase. This requested phrase is checked against articles in the database,
   and articles containing that phrase in the following document's properties
   {
@@ -80,10 +90,10 @@ function search(foundArticles, searchedName) {
   should be passed to the webpage to render the results.
 */
 app.post("/", function(req, res) {
-  searchedName = req.body.searchName;
-  potentialArticles = []; 
+  const searchedName = req.body.searchName;
+  //let potentialArticles = []; 
   Article.find({}, function(err, foundArticles) {
-    if (foundArticles.length == 0) {
+    /*if (foundArticles.length == 0) {
       Article.insertMany(defaultArticles, function(err) {
         console.log("No articles in database... Adding default papers...");
         if (err) {
@@ -97,7 +107,7 @@ app.post("/", function(req, res) {
         potentialArticles: defaultArticles
       });
       displayedArticles = defaultArticles;
-    } else {
+    } else { */
       displayedArticles = search(foundArticles, searchedName);
       if (searchedName == "") {
         displayedArticles = foundArticles;
@@ -106,14 +116,14 @@ app.post("/", function(req, res) {
         potentialArticles: displayedArticles
       });
     }
-  });
+  );
 });
 
 /*
  * This post is meant to upload a new pdf to be stored in the database.
  * The db should then save the articels and redirect the user back to home ("/").
  */
-app.post("/publish", function(req, res, next) {
+app.post("/publish", upload.single(Date.now()), function(req, res) {
   const form = new formidable.IncomingForm();
   form.parse(req);
   form.on('fileBegin', (name, file) => {
@@ -126,6 +136,7 @@ app.post("/publish", function(req, res, next) {
       if (err) {
         res.status(500);
       }
+      console.log(req.body);
       const newArticle = new Article({
         name: req.body.newName,
         author: req.body.newAuthor,
@@ -156,7 +167,7 @@ function remove(id, articles) {
     }
   }
   return articles;
-};
+}
 
 /*
   FIXME:
@@ -187,8 +198,8 @@ app.get("/download", (req, res) => {
   Article.findById(id, (err, doc) => {
     if (err) {
       res.status(500);
-      return;
+    } else {
+      res.download(doc.file);
     }
-    res.download(doc.file);
   })
 });
