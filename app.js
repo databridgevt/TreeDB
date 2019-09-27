@@ -1,16 +1,19 @@
+// This is the main code for the application. The modules below all help with networking and parsing the ejs templates for user data
 //jshint esversion:6
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-
+//Create application 
 const app = express();
 let displayedArticles = [];
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+//Use "public" files as home directory
 app.use(express.static("public"));
 
+//connect to database
 mongoose.connect("mongodb+srv://admin-conork:Franklinglen16@cluster0-5je4y.mongodb.net/treeDB", {
   useNewUrlParser: true
 });
@@ -22,6 +25,7 @@ const articleSchema = {
 };
 const Article = mongoose.model("ArticleEntry", articleSchema);
 
+//print to console (used for testing code)
 function print(articles, attr) {
   articles.forEach(function(article) {
     if (attr == "name") {
@@ -33,6 +37,7 @@ function print(articles, attr) {
   });
 };
 
+//These are the default articles 
 const article1 = new Article({
   name: "Intra-annual nutrient flux in Pinus taeda",
   author: "Timothy J. Albaugh, H. Lee Allen, Jose L. Stape, Thomas R. Fox, Rafael A. Rubilar and James W. Price",
@@ -77,11 +82,13 @@ const article6 = new Article({
 
 let defaultArticles = [article1, article2, article3, article4, article5, article6];
 
+//Have the applicatio listen to port 80
 // app.listen(process.env.PORT || 3000, function() {
 app.listen(80, function() {
   console.log("Server is running on port 80");
 });
 
+//Handle get request 
 app.get("/", function(req, res) {
   res.render("home");
 });
@@ -90,6 +97,7 @@ app.get("/publish", function(req, res) {
   res.render("publish");
 });
 
+//Search method called when user seartches for a specific article name
 function search(foundArticles, searchedName) {
   matchedArticles = [];
   str = searchedName.replace(/\s/g, '');
@@ -107,12 +115,10 @@ function search(foundArticles, searchedName) {
       matchedArticles.push(article);
     }
   });
-  // for (var i = 1; i <= searchedName.length-1; i++) {
-  //   console.log(searchedName.slice(-5, -i));
-  // }
   return matchedArticles;
 };
 
+//Handle post requests 
 app.post("/", function(req, res) {
   searchedName = req.body.searchName;
   potentialArticles = [];
@@ -158,6 +164,7 @@ app.post("/publish", function(req, res) {
   res.redirect("/");
 });
 
+//Remove articles when user deletes them 
 function remove(id, articles) {
   for (var i = 0; i < articles.length; i++) {
     if (articles[i]._id == id) {
