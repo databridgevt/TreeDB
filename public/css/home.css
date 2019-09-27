@@ -1,3 +1,4 @@
+/* This is the style sheet for the home page. It is imported to home.ejs template*/
 body {
   background-image: url("images/treeBackground1.png");
   background-repeat: no-repeat;
